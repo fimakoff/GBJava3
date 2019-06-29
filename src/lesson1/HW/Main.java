@@ -1,14 +1,13 @@
 package lesson1.HW;
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
         exercise1(2);
-        exercise2(5);
+        exercise2(4);
     }
 
     private static void exercise2(int nums) {
