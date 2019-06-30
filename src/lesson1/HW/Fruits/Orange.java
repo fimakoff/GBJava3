@@ -1,7 +1,7 @@
 package lesson1.HW.Fruits;
 
-public class Apple implements Fruit {
+public class Orange implements Fruit {
     public float getWeight() {
-        return 1.0f;
+        return 1.5f;
     }
 }
