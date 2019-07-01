@@ -1,7 +1,6 @@
 package lesson1.HW.exercise3;
 
 import lesson1.HW.exercise3.Fruits.Fruit;
-
 import java.util.ArrayList;
 
 class Box<T extends Fruit> {
@@ -14,30 +13,26 @@ class Box<T extends Fruit> {
     }
 
     void add(T fruit, int numsOfFruits) {
-        for (int i = 0; i < numsOfFruits; i++) {
-            arrayListOfFruits.add(fruit);
-            weightOfBox += fruit.getWeight();
-        }
+        for (int i = 0; i < numsOfFruits; i++) arrayListOfFruits.add(fruit);
     }
 
     void add(T fruit) {
         arrayListOfFruits.add(fruit);
-        weightOfBox += fruit.getWeight();
     }
 
     float getWeightBox() {
-        return weightOfBox;
+        return (weightOfBox + 1) * arrayListOfFruits.size();
     }
 
     boolean compareOfWeight(Box<?> anotherBox) {
-        return weightOfBox == anotherBox.getWeightBox();
+        return this.getWeightBox() == anotherBox.getWeightBox();
     }
 
     void intersperse(Box<T> anotherFruitBox) {
         for (T listOfFruit : arrayListOfFruits) {
             anotherFruitBox.add(listOfFruit);
-            weightOfBox -= listOfFruit.getWeight();
         }
+        weightOfBox = 0;
         arrayListOfFruits.clear();
     }
 }
