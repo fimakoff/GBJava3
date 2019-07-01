@@ -1,6 +1,6 @@
-package lesson1.HW;
+package lesson1.HW.exercise3;
 
-import lesson1.HW.Fruits.Fruit;
+import lesson1.HW.exercise3.Fruits.Fruit;
 
 import java.util.ArrayList;
 
