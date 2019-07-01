@@ -8,11 +8,7 @@ public class MainEx2 {
     private static final int nums = 4;
 
     private static <T> ArrayList<T> arrayToList(T[] arr) {
-        ArrayList<T> arrayList = new ArrayList<>();
-        for (int i = 0; i < arr.length; i++) {
-            arrayList.add((T) ("El#" + i + ": " + arr[i]));
-        }
-        return arrayList;
+        return new ArrayList<>(Arrays.asList(arr));
     }
 
     public static void main(String[] args) {
