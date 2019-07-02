@@ -2,12 +2,13 @@ package lesson1.HW.exercise2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainEx2 {
 
     private static final int nums = 4;
 
-    private static <T> ArrayList<T> arrayToList(T[] arr) {
+    private static <T> List<T> arrayToList(T[] arr) {
         return new ArrayList<>(Arrays.asList(arr));
     }
 
@@ -17,7 +18,7 @@ public class MainEx2 {
             arr[i] = i + 1;
         }
         System.out.println("Array: " + Arrays.toString(arr));
-        ArrayList<Object> arrayList = arrayToList(arr);
+        List<Object> arrayList = arrayToList(arr);
         System.out.println("List: " + arrayList);
     }
 }
