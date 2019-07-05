@@ -151,9 +151,9 @@ public class Controller {
             connect();
         }
         try {
-            out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
-            login = loginField.getText();
-            password = passwordField.getText();
+            login = loginField.getText().trim();
+            password = passwordField.getText().trim();
+            out.writeUTF("/auth " + login + " " + password);
             loginField.clear();
             passwordField.clear();
         } catch (IOException e) {
