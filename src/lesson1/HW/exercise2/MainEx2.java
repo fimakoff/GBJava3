@@ -16,7 +16,7 @@ public class MainEx2 {
     public static void main(String[] args) {
         Object[] arr = new Object[nums];
 
-        Stream.iterate(0, i -> i < arr.length, i -> (i + 1)).forEach(i -> arr[i] = i + 3);
+//        Stream.iterate(0, i -> i < arr.length, i -> (i + 1)).forEach(i -> arr[i] = i + 3);
 
         System.out.println("Array: " + Arrays.toString(arr));
         List<Object> arrayList = arrayToList(arr);
