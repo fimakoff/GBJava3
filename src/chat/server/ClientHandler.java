@@ -1,6 +1,4 @@
-package lesson2.HW.server;
-
-import lesson2.HW.client.Controller;
+package chat.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,33 +57,32 @@ class ClientHandler {
                     // /w nick
                     if (str.startsWith("/w ")) {
                         String[] tokens = str.split(" ", 3);
-                        authService.setBlackList(false, tokens[1]);
-                        if (checkBlackList(tokens[1])) {
+                        authService.setBlackList(0, tokens[1]);
+                        if (!checkBlackList(tokens[1])) {
                             server.sendPersonalMsg(this, tokens[1], tokens[2]);
                         }
-
                     }
                     // /blacklist nick
                     if (str.startsWith("/blacklist ")) {
                         String[] tokens = str.split(" ");
                         blackList.add(tokens[1]);
-                        authService.setBlackList(true,tokens[1]);
+                        authService.setBlackList(1,tokens[1]);
                         System.out.println(Arrays.toString(blackList.toArray()));
                         sendMsg("Вы добавили пользователя с ником " + tokens[1] +
                                 " в черный список!");
                     }
                     // /unblacklist nick
                     if (str.startsWith("/unblacklist ")) {
-                        String[] tokens = str.split(" ");
+                        String[] tokens = str.split(" ",2);
                         blackList.remove(tokens[1]);
-                        authService.setBlackList(false,tokens[1]);
+                        authService.setBlackList(0,tokens[1]);
                         System.out.println(Arrays.toString(blackList.toArray()));
                         sendMsg("Вы удалили пользователя с ником " + tokens[1] +
                                 " из черного списка!");
                     }
                     // /updatenick login password newnick
                     if (str.startsWith("/updatenick ")) {
-                        String[] tokens = str.split(" ");
+                        String[] tokens = str.split(" ",4);
                         authService.setNick(tokens[1], tokens[2], tokens[3]);
                         nick = authService.getNick(tokens[1], tokens[2]);
                         sendMsg("Вы изменили свой ник на " + nick);

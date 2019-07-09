@@ -1,4 +1,4 @@
-package lesson2.HW.client;
+package chat.client;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -8,9 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,20 +41,21 @@ public class Controller {
     private static String login;
     private static String password;
 
+    private StringBuffer sb = new StringBuffer();
 
 
     void timeOut(int time) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             int i = time;
+
             @Override
             public void run() {
                 System.out.println(Controller.isAuthorized + " " + i--);
-                if (Controller.isAuthorized && i != 0){
+                if (Controller.isAuthorized && i != 0) {
                     System.out.println("Client is already connected with login: \"" + login + "\" password: \"" + password + "\"");
                     timer.cancel();
-                }
-                else if (i == 0) {
+                } else if (i == 0) {
                     System.exit(0);
                     System.out.println("Client is terminated");
                     close();
@@ -116,12 +115,14 @@ public class Controller {
     }
 
     private void read() throws IOException {
+        readFromFile();
         while (true) {
             String str = in.readUTF();
+            writeInFile(str);
             if (str.equalsIgnoreCase("/serverclosed")) {
                 break;
             }
-            if (str.startsWith("/clientlist")||str.startsWith("/updatenick")) {
+            if (str.startsWith("/clientlist") || str.startsWith("/updatenick")) {
                 String[] tokens = str.split(" ");
                 Platform.runLater(() -> {
                     clientList.getItems().clear();
@@ -166,6 +167,43 @@ public class Controller {
             out.writeUTF(msgField.getText());
             msgField.clear();
             msgField.requestFocus();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeInFile(String str) {
+        try {
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter("history_[" + login + "].txt"));
+            sb.append(str+"\n");
+            out.writeUTF(String.valueOf(sb));
+            writer.write(sb.toString());
+            writer.flush();
+            writer.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void readFromFile() {
+
+        try {
+            File file = new File("history_[" + login + "].txt");
+            FileReader fr = new FileReader(file);
+            BufferedReader reader = new BufferedReader(fr);
+            String line = reader.readLine();
+            while (line != null) {
+                chatArea.appendText(line);
+                line = reader.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            try {
+                out.writeUTF("ББ приветствует тебя в чате!");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            System.err.println("файла нет");
         } catch (IOException e) {
             e.printStackTrace();
         }
