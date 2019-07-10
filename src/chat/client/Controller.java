@@ -10,8 +10,7 @@ import javafx.scene.layout.HBox;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Controller {
 
@@ -42,7 +41,9 @@ public class Controller {
     private static String password;
 
     private StringBuffer sb = new StringBuffer();
-
+    private List<String> chatHistory = new ArrayList<>();
+    private LinkedList<String> loadChatHistory = new LinkedList<>();
+    private int numberOfLoadLines = 100;
 
     void timeOut(int time) {
         Timer timer = new Timer();
@@ -174,32 +175,49 @@ public class Controller {
 
     private void writeInFile(String str) {
         try {
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter("history_[" + login + "].txt"));
-            sb.append(str+"\n");
-            out.writeUTF(String.valueOf(sb));
-            writer.write(sb.toString());
+            BufferedWriter writer = new BufferedWriter(
+                    new FileWriter("history_[" + login + "].txt", true));
+            chatHistory.add(str + System.lineSeparator());
+            writer.write(chatHistory.get(chatHistory.size() - 1));
             writer.flush();
             writer.close();
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void readFromFile() {
-
         try {
-            File file = new File("history_[" + login + "].txt");
-            FileReader fr = new FileReader(file);
-            BufferedReader reader = new BufferedReader(fr);
+            File historyLogin = new File("history_[" + login + "].txt");
+            BufferedReader reader = new BufferedReader(new FileReader(historyLogin));
+            long startToRead = System.currentTimeMillis();
             String line = reader.readLine();
             while (line != null) {
-                chatArea.appendText(line);
+                loadChatHistory.addFirst(line);
                 line = reader.readLine();
             }
+            int count = 0;
+            if (numberOfLoadLines > loadChatHistory.size()) {
+                for (int i = loadChatHistory.size() - 1; i >= 0; i--) {
+                    if (loadChatHistory.get(i) != null) {
+                        sb.append(loadChatHistory.get(i)).append(System.lineSeparator());
+                        count++;
+                    }
+                }
+            } else {
+                for (int i = numberOfLoadLines - 1; i >= 0; i--) {
+                    if (loadChatHistory.get(i) != null) {
+                        sb.append(loadChatHistory.get(i)).append(System.lineSeparator());
+                        count++;
+                    }
+                }
+            }
+            chatArea.appendText(sb + "\n");
+            System.out.println("Time to load last " + count + " lines from " + loadChatHistory.size()
+                    + " lines: " + (System.currentTimeMillis() - startToRead));
         } catch (FileNotFoundException e) {
             try {
-                out.writeUTF("ББ приветствует тебя в чате!");
+                out.writeUTF("ББ приветствует тебя в чате! Логов не обнаружено.");
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

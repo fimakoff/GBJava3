@@ -13,7 +13,7 @@
 
     <HBox VBox.vgrow="ALWAYS">
         <VBox HBox.hgrow="ALWAYS">
-            <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" wrapText="true"/>
+            <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" wrapText="true" scrollTop="-Infinity"/>
             <HBox fx:id="bottomPanel" managed="false" visible="false">
                 <TextField fx:id="msgField" onAction="#sendMsg" promptText="Введите сообщение..." HBox.hgrow="ALWAYS"/>
                 <Button text="Отправить" onAction="#sendMsg"/>
