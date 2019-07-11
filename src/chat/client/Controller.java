@@ -1,4 +1,4 @@
-package lesson2.HW.client;
+package chat.client;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -8,12 +8,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Controller {
 
@@ -43,20 +40,23 @@ public class Controller {
     private static String login;
     private static String password;
 
-
+    private StringBuffer sb = new StringBuffer();
+    private List<String> chatHistory = new ArrayList<>();
+    private LinkedList<String> loadChatHistory = new LinkedList<>();
+    private int numberOfLoadLines = 100;
 
     void timeOut(int time) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             int i = time;
+
             @Override
             public void run() {
                 System.out.println(Controller.isAuthorized + " " + i--);
-                if (Controller.isAuthorized && i != 0){
+                if (Controller.isAuthorized && i != 0) {
                     System.out.println("Client is already connected with login: \"" + login + "\" password: \"" + password + "\"");
                     timer.cancel();
-                }
-                else if (i == 0) {
+                } else if (i == 0) {
                     System.exit(0);
                     System.out.println("Client is terminated");
                     close();
@@ -116,12 +116,14 @@ public class Controller {
     }
 
     private void read() throws IOException {
+        readFromFile();
         while (true) {
             String str = in.readUTF();
+            writeInFile(str);
             if (str.equalsIgnoreCase("/serverclosed")) {
                 break;
             }
-            if (str.startsWith("/clientlist")||str.startsWith("/updatenick")) {
+            if (str.startsWith("/clientlist") || str.startsWith("/updatenick")) {
                 String[] tokens = str.split(" ");
                 Platform.runLater(() -> {
                     clientList.getItems().clear();
@@ -166,6 +168,60 @@ public class Controller {
             out.writeUTF(msgField.getText());
             msgField.clear();
             msgField.requestFocus();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeInFile(String str) {
+        try {
+            BufferedWriter writer = new BufferedWriter(
+                    new FileWriter("history_[" + login + "].txt", true));
+            chatHistory.add(str + System.lineSeparator());
+            writer.write(chatHistory.get(chatHistory.size() - 1));
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readFromFile() {
+        try {
+            File historyLogin = new File("history_[" + login + "].txt");
+            BufferedReader reader = new BufferedReader(new FileReader(historyLogin));
+            long startToRead = System.currentTimeMillis();
+            String line = reader.readLine();
+            while (line != null) {
+                loadChatHistory.addFirst(line);
+                line = reader.readLine();
+            }
+            int count = 0;
+            if (numberOfLoadLines > loadChatHistory.size()) {
+                for (int i = loadChatHistory.size() - 1; i >= 0; i--) {
+                    if (loadChatHistory.get(i) != null) {
+                        sb.append(loadChatHistory.get(i)).append(System.lineSeparator());
+                        count++;
+                    }
+                }
+            } else {
+                for (int i = numberOfLoadLines - 1; i >= 0; i--) {
+                    if (loadChatHistory.get(i) != null) {
+                        sb.append(loadChatHistory.get(i)).append(System.lineSeparator());
+                        count++;
+                    }
+                }
+            }
+            chatArea.appendText(sb + "\n");
+            System.out.println("Time to load last " + count + " lines from " + loadChatHistory.size()
+                    + " lines: " + (System.currentTimeMillis() - startToRead));
+        } catch (FileNotFoundException e) {
+            try {
+                out.writeUTF("ББ приветствует тебя в чате! Логов не обнаружено.");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            System.err.println("файла нет");
         } catch (IOException e) {
             e.printStackTrace();
         }

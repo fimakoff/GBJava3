@@ -1,4 +1,4 @@
-package lesson2.HW.client;
+package chat.client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,14 +9,18 @@ import javafx.stage.Stage;
 
 public class Client extends Application {
 
+    private final int timeToLogin = 120;
+    private final int width = 600;
+    private final int height = 275;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("client.fxml"));
         primaryStage.getIcons().add(new Image("file:img/icon.png"));
-        primaryStage.setTitle("Client");
-        primaryStage.setScene(new Scene(root, 500, 275));
         Controller ct = new Controller();
-        ct.timeOut(120);
+        ct.timeOut(timeToLogin);
+        primaryStage.setTitle("Client");
+        primaryStage.setScene(new Scene(root, width, height));
         primaryStage.show();
     }
 

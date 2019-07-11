@@ -1,4 +1,4 @@
-package lesson2.HW.server;
+package chat.server;
 
 import java.sql.*;
 
@@ -12,7 +12,7 @@ interface AuthService {
 
     void setNick(String login, String password, String newNick);
 
-    void setBlackList(boolean sbl, String nick);
+    void setBlackList(int sbl, String nick);
 
     boolean isBlackList(String nick);
 }
@@ -25,7 +25,7 @@ class AuthServiceImpl implements AuthService {
     @Override
     public void connect() {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:src/lesson2/HW/db");
+            connection = DriverManager.getConnection("jdbc:sqlite:db");
             statement = connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -44,9 +44,7 @@ class AuthServiceImpl implements AuthService {
     @Override
     public void setNick(String login, String password, String newNick) {
         String nick = getNick(login, password);
-        String query = String.format("UPDATE users \n" +
-                "SET nick = '%s'\n" +
-                "WHERE nick = '%s'", newNick, nick);
+        String query = String.format("UPDATE users SET nick = '%s' WHERE nick = '%s'", newNick, nick);
         try {
             statement.executeUpdate(query);
         } catch (SQLException e) {
@@ -55,17 +53,8 @@ class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void setBlackList(boolean sbl, String nick) {
-        byte setBlackList;
-        if (sbl) {
-            setBlackList = 1;
-        } else {
-            setBlackList = 0;
-        }
-
-        String query = String.format("UPDATE users \n" +
-                "SET isBlackList = '%s'\n" +
-                "WHERE nick = '%s'", setBlackList, nick);
+    public void setBlackList(int sbl, String nick) {
+        String query = String.format("UPDATE users SET isBlackList = '%d' WHERE nick = '%s'", sbl, nick);
         try {
             statement.executeUpdate(query);
         } catch (SQLException e) {
@@ -75,9 +64,7 @@ class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean isBlackList(String nick) {
-        String query = String.format("SELECT nick FROM users\n"
-                + "WHERE nick = '%s'\n " +
-                "AND isBlackList = '1'", nick);
+        String query = String.format("SELECT nick FROM users WHERE nick = '%s' AND isBlackList = '1'", nick);
         try {
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
@@ -91,9 +78,7 @@ class AuthServiceImpl implements AuthService {
 
     @Override
     public String getNick(String login, String pass) {
-        String query = String.format("SELECT nick FROM users\n"
-                + "WHERE login = '%s'\n"
-                + "  AND password = '%s'\n", login, pass);
+        String query = String.format("select nick from users where login = '%s' and password = '%s'", login, pass);
         try {
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
