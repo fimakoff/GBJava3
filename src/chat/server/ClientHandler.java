@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-class ClientHandler {
+class ClientHandler implements Runnable{
 
     private Socket socket;
     private Server server;
@@ -17,6 +17,18 @@ class ClientHandler {
     private DataInputStream in;
     private String nick;
     private List<String> blackList;
+
+    @Override
+    public void run() {
+        try {
+            authorization();
+            read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+    }
 
     String getNick() {
         return nick;
@@ -30,16 +42,6 @@ class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.authService = new AuthServiceImpl();
             this.socket = socket;
-            new Thread(() -> {
-                try {
-                    authorization();
-                    read();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    close();
-                }
-            }).start();
         } catch (IOException e) {
             e.printStackTrace();
         }

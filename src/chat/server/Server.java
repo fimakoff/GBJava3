@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class StartServer {
 
@@ -16,23 +18,28 @@ class StartServer {
 class Server {
 
     private List<ClientHandler> peers;
+    private int poolSize = Runtime.getRuntime().availableProcessors();
+
 
     Server() {
         AuthService authService = new AuthServiceImpl();
         peers = new CopyOnWriteArrayList<>();
         ServerSocket serverSocket = null;
         Socket socket = null;
+        ExecutorService pool = null;
         try {
             authService.connect();
             serverSocket = new ServerSocket(8181);
             System.out.println("Сервер запущен!");
             while (true) {
+                pool = Executors.newFixedThreadPool(poolSize);
                 socket = serverSocket.accept();
+                pool.execute(new ClientHandler(this, socket));
                 System.out.println("Клиент подключился!");
-                new ClientHandler(this, socket);
             }
         } catch (IOException e) {
             e.printStackTrace();
+            pool.shutdown();
         } finally {
             try {
                 socket.close();
