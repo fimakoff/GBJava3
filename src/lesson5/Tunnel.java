@@ -17,10 +17,7 @@ public class Tunnel extends Stage {
         try {
             try {
                 semaphore.acquire();
-                if(semaphore.tryAcquire(2)){
-                    System.out.println(c.getName() + " готовится к этапу(ждет): " + description);
-
-                }
+                System.out.println(c.getName() + " готовится к этапу(ждет): " + description);
                 System.out.println(c.getName() + " начал этап: " + description);
                 Thread.sleep(length / c.getSpeed() * 1000);
             } catch (InterruptedException e) {
