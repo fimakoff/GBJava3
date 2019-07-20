@@ -48,8 +48,7 @@ class Server {
                 LOGGER.log(Level.INFO, "Клиент подключился!");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Подключение не удалось");
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Подключение не удалось\n" + e.getMessage());
             pool.shutdown();
         } finally {
             try {
@@ -57,7 +56,7 @@ class Server {
                 serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                LOGGER.log(Level.WARNING, "Подключение не удалось. Соединение закрыто.");
+                LOGGER.log(Level.WARNING, "Подключение не удалось. Соединение закрыто.\n" + e.getMessage());
             }
             authService.disconnect();
         }
