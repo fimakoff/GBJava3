@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.*;
 
 class StartServer {
 
@@ -19,9 +20,16 @@ class Server {
 
     private List<ClientHandler> peers;
     private int poolSize = Runtime.getRuntime().availableProcessors();
-
-
+    static final Logger LOGGER = Logger.getLogger(Server.class.getName());
     Server() {
+        LOGGER.setLevel(Level.ALL);
+        try {
+            Handler h = new FileHandler("src\\chat\\Logging_Server.txt");
+            h.setFormatter(new SimpleFormatter());
+            LOGGER.addHandler(h);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         AuthService authService = new AuthServiceImpl();
         peers = new CopyOnWriteArrayList<>();
         ServerSocket serverSocket = null;
@@ -31,21 +39,23 @@ class Server {
             authService.connect();
             serverSocket = new ServerSocket(8181);
             System.out.println("Сервер запущен!");
+            LOGGER.log(Level.INFO, "Сервер запущен!!!");
             while (true) {
                 pool = Executors.newFixedThreadPool(poolSize);
                 socket = serverSocket.accept();
                 pool.execute(new ClientHandler(this, socket));
                 System.out.println("Клиент подключился!");
+                LOGGER.log(Level.INFO, "Клиент подключился!");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Подключение не удалось\n" + e.getMessage());
             pool.shutdown();
         } finally {
             try {
                 socket.close();
                 serverSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, "Подключение не удалось. Соединение закрыто.\n" + e.getMessage());
             }
             authService.disconnect();
         }
@@ -99,5 +109,6 @@ class Server {
         for (ClientHandler clientHandler : peers) {
             clientHandler.sendMsg(out);
         }
+        LOGGER.log(Level.INFO, out);
     }
 }

@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 
 class ClientHandler implements Runnable{
 
@@ -104,7 +105,8 @@ class ClientHandler implements Runnable{
                 } else {
                     server.broadcast(this, nick + " " + str);
                 }
-                System.out.println("Client " + str);
+                System.out.println(nick + " " + str);
+                Server.LOGGER.log(Level.INFO, nick + " " + str);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -140,6 +142,7 @@ class ClientHandler implements Runnable{
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+            Server.LOGGER.log(Level.WARNING, "Попытка закрыть закрытое соединение");
         }
         server.unsubscribe(this);
     }
@@ -149,6 +152,7 @@ class ClientHandler implements Runnable{
             out.writeUTF(message);
         } catch (IOException e) {
             e.printStackTrace();
+            Server.LOGGER.log(Level.WARNING, "Не удалось отправить сообщение!");
         }
     }
 
