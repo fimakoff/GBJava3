@@ -55,7 +55,6 @@ class Server {
                 socket.close();
                 serverSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
                 LOGGER.log(Level.WARNING, "Подключение не удалось. Соединение закрыто.\n" + e.getMessage());
             }
             authService.disconnect();
